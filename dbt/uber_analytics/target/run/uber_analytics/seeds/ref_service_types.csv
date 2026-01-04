@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "uber_analytics"."dev_staging"."ref_service_types" (service_type_id varchar(20),service_name text,service_category text,base_fare_multiplier float8,min_fare_usd integer,commission_rate float8,is_pool boolean,is_premium boolean,is_active boolean)
+  ;
+    -- dbt seed --
+    
+          insert into "uber_analytics"."dev_staging"."ref_service_types" (service_type_id, service_name, service_category, base_fare_multiplier, min_fare_usd, commission_rate, is_pool, is_premium, is_active) values
+          (%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s)
+      
+
+;
+  

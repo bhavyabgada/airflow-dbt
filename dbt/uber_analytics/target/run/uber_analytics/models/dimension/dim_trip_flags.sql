@@ -1,4 +1,14 @@
-/*
+
+  
+    
+
+  create  table "uber_analytics"."dev_dimension"."dim_trip_flags__dbt_tmp"
+  
+  
+    as
+  
+  (
+    /*
     Model: dim_trip_flags
     Layer: Dimension
     Description: 
@@ -9,10 +19,7 @@
     - #25 Junk Dimensions: Combine boolean flags
 */
 
-{{ config(
-    materialized='table',
-    tags=['dimension', 'junk']
-) }}
+
 
 -- Generate all possible combinations of flags using generate_series
 with bool_values as (
@@ -44,10 +51,35 @@ flag_combinations as (
 
 select
     -- Junk dimension key
-    {{ generate_junk_dim_key([
-        'is_surge', 'is_pool', 'is_premium', 'has_tip', 
-        'has_promo', 'is_late_arrival', 'is_completed', 'is_cancelled'
-    ]) }} as trip_flag_key,
+    
+    md5(
+        
+            coalesce(cast(is_surge as varchar), 'N')
+             || 
+        
+            coalesce(cast(is_pool as varchar), 'N')
+             || 
+        
+            coalesce(cast(is_premium as varchar), 'N')
+             || 
+        
+            coalesce(cast(has_tip as varchar), 'N')
+             || 
+        
+            coalesce(cast(has_promo as varchar), 'N')
+             || 
+        
+            coalesce(cast(is_late_arrival as varchar), 'N')
+             || 
+        
+            coalesce(cast(is_completed as varchar), 'N')
+             || 
+        
+            coalesce(cast(is_cancelled as varchar), 'N')
+            
+        
+    )
+ as trip_flag_key,
     
     -- Individual flags
     is_surge,
@@ -79,3 +111,5 @@ select
     current_timestamp as _loaded_at
 
 from flag_combinations
+  );
+  

@@ -1,0 +1,12 @@
+
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+        select *
+        from "uber_analytics"."dev_quality"."not_null_int_trips_unified_total_fare_usd"
+    
+      
+    ) dbt_internal_test

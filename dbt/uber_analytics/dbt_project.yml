@@ -87,7 +87,7 @@ seeds:
         
     ref_service_types:
       +column_types:
-        service_type_id: varchar(10)
+        service_type_id: varchar(20)
 
 # =============================================================================
 # Model Configurations
@@ -144,10 +144,8 @@ tests:
 # =============================================================================
 on-run-start:
   - "{{ log('🚗 Starting Uber Analytics pipeline run', info=True) }}"
-  - "{{ create_audit_entry('PIPELINE_START') }}"
 
 on-run-end:
-  - "{{ create_audit_entry('PIPELINE_END') }}"
   - "{{ log('✅ Uber Analytics pipeline completed', info=True) }}"
 
 # =============================================================================

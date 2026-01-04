@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "uber_analytics"."dev_staging"."source_trips_driver_app" (trip_id text,driver_id text,vehicle_id text,city_id text,service_type_id text,trip_status text,request_timestamp timestamp without time zone,accept_timestamp timestamp without time zone,pickup_timestamp timestamp without time zone,dropoff_timestamp timestamp without time zone,pickup_lat float8,pickup_lon float8,dropoff_lat float8,dropoff_lon float8,distance_miles float8,duration_minutes integer,base_fare float8,surge_multiplier float8,surge_amount float8,tips float8,tolls float8,total_fare float8,driver_earnings float8,currency_code text,rating_by_rider integer,source_system text,extracted_at timestamp without time zone)
+  ;
+    -- dbt seed --
+    
+          insert into "uber_analytics"."dev_staging"."source_trips_driver_app" (trip_id, driver_id, vehicle_id, city_id, service_type_id, trip_status, request_timestamp, accept_timestamp, pickup_timestamp, dropoff_timestamp, pickup_lat, pickup_lon, dropoff_lat, dropoff_lon, distance_miles, duration_minutes, base_fare, surge_multiplier, surge_amount, tips, tolls, total_fare, driver_earnings, currency_code, rating_by_rider, source_system, extracted_at) values
+          (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+      
+
+;
+  

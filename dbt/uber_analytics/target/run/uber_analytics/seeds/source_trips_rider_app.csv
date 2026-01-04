@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "uber_analytics"."dev_staging"."source_trips_rider_app" (trip_id text,rider_id text,city_id text,service_type_id text,trip_status text,request_timestamp timestamp without time zone,pickup_address text,dropoff_address text,estimated_fare integer,actual_fare float8,payment_method text,promo_code text,promo_discount float8,rating_given_to_driver integer,feedback_text text,source_system text,extracted_at timestamp without time zone)
+  ;
+    -- dbt seed --
+    
+          insert into "uber_analytics"."dev_staging"."source_trips_rider_app" (trip_id, rider_id, city_id, service_type_id, trip_status, request_timestamp, pickup_address, dropoff_address, estimated_fare, actual_fare, payment_method, promo_code, promo_discount, rating_given_to_driver, feedback_text, source_system, extracted_at) values
+          (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+      
+
+;
+  

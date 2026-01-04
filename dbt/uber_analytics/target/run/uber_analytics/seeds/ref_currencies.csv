@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "uber_analytics"."dev_staging"."ref_currencies" (currency_code varchar(3),currency_name text,symbol text,decimal_places integer,is_active boolean)
+  ;
+    -- dbt seed --
+    
+          insert into "uber_analytics"."dev_staging"."ref_currencies" (currency_code, currency_name, symbol, decimal_places, is_active) values
+          (%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s)
+      
+
+;
+  

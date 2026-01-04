@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "uber_analytics"."dev_staging"."ref_trip_status" (status_id integer,status_name text,status_category text,is_completed boolean,is_cancelled boolean,is_billable boolean,display_order integer)
+  ;
+    -- dbt seed --
+    
+          insert into "uber_analytics"."dev_staging"."ref_trip_status" (status_id, status_name, status_category, is_completed, is_cancelled, is_billable, display_order) values
+          (%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s)
+      
+
+;
+  

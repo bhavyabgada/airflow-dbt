@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "uber_analytics"."dev_staging"."source_vehicles" (vehicle_id text,driver_id text,make text,model text,year integer,color text,license_plate text,vehicle_type text,capacity integer,is_primary boolean,registration_expiry date,insurance_expiry date,inspection_date date,is_active boolean,source_system text,extracted_at timestamp without time zone)
+  ;
+    -- dbt seed --
+    
+          insert into "uber_analytics"."dev_staging"."source_vehicles" (vehicle_id, driver_id, make, model, year, color, license_plate, vehicle_type, capacity, is_primary, registration_expiry, insurance_expiry, inspection_date, is_active, source_system, extracted_at) values
+          (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+      
+
+;
+  
