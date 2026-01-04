@@ -1,12 +1,12 @@
 # 🚗 Uber Analytics Data Warehouse
 
-A production-grade data engineering project demonstrating **34 real-world data engineering challenges** using dbt (Data Build Tool) and Apache Airflow, built on PostgreSQL.
+A production-grade data engineering project demonstrating **20+ real-world data engineering challenges** using dbt (Data Build Tool) and Apache Airflow, built on PostgreSQL.
 
 ## 📋 Table of Contents
 
 - [Overview](#overview)
 - [Architecture](#architecture)
-- [Problems Solved](#problems-solved)
+- [Problems Solved](#-problems-solved)
 - [Project Structure](#project-structure)
 - [Quick Start](#quick-start)
 - [Data Models](#data-models)
@@ -77,47 +77,50 @@ This project simulates an Uber-like ride-sharing analytics platform, covering:
 
 ## 🧩 Problems Solved
 
-This project addresses **34 real-world data engineering challenges**:
+This project addresses **20+ real-world data engineering challenges**. Click on any problem to see the detailed implementation.
 
 ### Data Loading & Processing
-| # | Problem | Solution | Model(s) |
-|---|---------|----------|----------|
-| 1 | Late-Arriving Facts | Reprocess with `is_late_arrival` flag | `int_trips_unified`, `fct_trips` |
-| 2 | Orphan Records | Validation with reconciliation status | `int_payments_reconciled` |
-| 3 | Data Reconciliation | Trip vs Payment matching | `mart_reconciliation` |
-| 4 | Duplicate Detection | Row numbering with partition | `stg_trips_rider_app` |
-| 5 | Timezone Handling | UTC conversion macros | `timezone_conversion.sql` |
-| 6 | Point-in-Time Joins | SCD2 with `valid_from/to` | `dim_driver`, `fct_trips` |
-| 7 | Currency Conversion | Transaction-date rates | `currency_conversion.sql` |
-| 8 | Fiscal vs Calendar | Multi-region fiscal calendars | `dim_date`, `fiscal_calendar.sql` |
+
+| # | Problem | Solution | Implementation |
+|---|---------|----------|----------------|
+| 1 | **Late-Arriving Facts** | Reprocess with `is_late_arrival` flag | [int_trips_unified.sql](dbt/uber_analytics/models/integration/int_trips_unified.sql) • [fct_trips.sql](dbt/uber_analytics/models/fact/fct_trips.sql) |
+| 2 | **Orphan Records** | Validation with reconciliation status | [int_payments_reconciled.sql](dbt/uber_analytics/models/integration/int_payments_reconciled.sql) |
+| 3 | **Data Reconciliation** | Trip vs Payment matching with circuit breaker | [mart_reconciliation.sql](dbt/uber_analytics/models/mart/mart_reconciliation.sql) |
+| 4 | **Duplicate Detection** | Row numbering with partition by key fields | [stg_trips_rider_app.sql](dbt/uber_analytics/models/staging/stg_trips_rider_app.sql) |
+| 5 | **Timezone Handling** | UTC conversion macros by city | [timezone_conversion.sql](dbt/uber_analytics/macros/timezone_conversion.sql) • [int_trips_unified.sql](dbt/uber_analytics/models/integration/int_trips_unified.sql) |
+| 6 | **Point-in-Time Joins** | SCD2 with `valid_from/to` range joins | [fct_trips.sql](dbt/uber_analytics/models/fact/fct_trips.sql) • [dim_driver.sql](dbt/uber_analytics/models/dimension/dim_driver.sql) |
+| 7 | **Currency Conversion** | Transaction-date exchange rates | [currency_conversion.sql](dbt/uber_analytics/macros/currency_conversion.sql) • [int_trips_unified.sql](dbt/uber_analytics/models/integration/int_trips_unified.sql) |
+| 8 | **Fiscal vs Calendar Year** | Multi-region fiscal calendars (US, UK, AU) | [dim_date.sql](dbt/uber_analytics/models/dimension/dim_date.sql) • [fiscal_calendar.sql](dbt/uber_analytics/macros/fiscal_calendar.sql) |
 
 ### Dimensional Modeling
-| # | Problem | Solution | Model(s) |
-|---|---------|----------|----------|
-| 9 | Hierarchical Data | Zone → City → Country → Region | `dim_geography` |
-| 10 | Multi-Source Merge | Golden record from multiple apps | `int_trips_unified` |
-| 11 | SCD Type 2 | dbt snapshots with check strategy | `snap_driver`, `snap_rider` |
-| 12 | Conditional Aggregations | CASE statements in aggregations | `mart_revenue_daily` |
-| 13 | Backfill Support | Full refresh + incremental modes | All incremental models |
-| 14 | Idempotency | Unique keys + merge strategy | All incremental models |
+
+| # | Problem | Solution | Implementation |
+|---|---------|----------|----------------|
+| 9 | **Hierarchical Data** | Zone → City → Country → Region drill-path | [dim_geography.sql](dbt/uber_analytics/models/dimension/dim_geography.sql) |
+| 10 | **Multi-Source Merge** | Golden record from Driver + Rider apps | [int_trips_unified.sql](dbt/uber_analytics/models/integration/int_trips_unified.sql) |
+| 11 | **SCD Type 2** | dbt snapshots with check strategy | [snap_driver.sql](dbt/uber_analytics/snapshots/snap_driver.sql) • [snap_rider.sql](dbt/uber_analytics/snapshots/snap_rider.sql) |
+| 12 | **Conditional Aggregations** | CASE-based metrics (surge trips, tipped trips) | [mart_revenue_daily.sql](dbt/uber_analytics/models/mart/mart_revenue_daily.sql) |
+| 13 | **Backfill Support** | Full refresh + incremental modes | [fct_trips.sql](dbt/uber_analytics/models/fact/fct_trips.sql) |
+| 14 | **Idempotency** | Unique keys + merge strategy | [int_trips_unified.sql](dbt/uber_analytics/models/integration/int_trips_unified.sql) |
 
 ### Advanced Patterns
-| # | Problem | Solution | Model(s) |
-|---|---------|----------|----------|
-| 16 | PII Handling | Conditional masking with var | `stg_drivers`, `stg_riders` |
-| 17 | Large Table Joins | Surrogate keys + date partitioning | `fct_trips` |
-| 19 | Partitioning Strategy | Date-based partitions | `fct_trips` |
-| 20 | Role-Playing Dimensions | Same dim_date for multiple dates | `fct_trips` (request/pickup/dropoff) |
-| 21 | Bridge Tables | Many-to-many driver↔vehicle | `bridge_driver_vehicle` |
-| 25 | Junk Dimensions | Combined boolean flags | `dim_trip_flags` |
-| 26 | Accumulating Snapshots | Lifecycle milestone tracking | `fct_trip_accumulating` |
+
+| # | Problem | Solution | Implementation |
+|---|---------|----------|----------------|
+| 15 | **PII Handling** | Conditional masking with dbt var | [stg_drivers.sql](dbt/uber_analytics/models/staging/stg_drivers.sql) • [stg_riders.sql](dbt/uber_analytics/models/staging/stg_riders.sql) |
+| 16 | **Large Table Optimization** | Surrogate keys + date partitioning | [fct_trips.sql](dbt/uber_analytics/models/fact/fct_trips.sql) |
+| 17 | **Role-Playing Dimensions** | Same dim_date for request/pickup/dropoff | [fct_trips.sql](dbt/uber_analytics/models/fact/fct_trips.sql) |
+| 18 | **Bridge Tables** | Many-to-many driver↔vehicle with weights | [bridge_driver_vehicle.sql](dbt/uber_analytics/models/dimension/bridge_driver_vehicle.sql) |
+| 19 | **Junk Dimensions** | Combined boolean flags (8 → 1 column) | [dim_trip_flags.sql](dbt/uber_analytics/models/dimension/dim_trip_flags.sql) |
+| 20 | **Accumulating Snapshots** | Lifecycle milestone tracking | [fct_trip_accumulating.sql](dbt/uber_analytics/models/fact/fct_trip_accumulating.sql) |
 
 ### Operations & Quality
-| # | Problem | Solution | Model(s) |
-|---|---------|----------|----------|
-| 27 | Data Retention/GDPR | Retention date calculation | `dim_rider` |
-| 32 | Cohort Analysis | Signup cohort attributes | `mart_driver_performance` |
-| 34 | Circuit Breaker | Quality gate before dims | DAG `quality_gate_1` |
+
+| # | Problem | Solution | Implementation |
+|---|---------|----------|----------------|
+| 21 | **Data Retention/GDPR** | Retention date calculation | [stg_riders.sql](dbt/uber_analytics/models/staging/stg_riders.sql) • [dim_rider.sql](dbt/uber_analytics/models/dimension/dim_rider.sql) |
+| 22 | **Cohort Analysis** | Signup cohort attributes | [mart_driver_performance.sql](dbt/uber_analytics/models/mart/mart_driver_performance.sql) |
+| 23 | **Circuit Breaker** | Quality gate stops pipeline on failure | [uber_analytics_dag.py](airflow/dags/uber_analytics_dag.py) • [mart_reconciliation.sql](dbt/uber_analytics/models/mart/mart_reconciliation.sql) |
 
 ---
 

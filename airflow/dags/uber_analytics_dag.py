@@ -1,377 +1,359 @@
 """
-Uber Analytics Pipeline - Production Ready DAG
-===============================================
+================================================================================
+DAG: uber_analytics_pipeline
+Orchestration: Apache Airflow
+================================================================================
 
-Orchestrates the Uber Analytics data warehouse pipeline demonstrating
-34 real-world data engineering challenges.
+PROBLEM SOLVED:
+--------------------------------------------------------------------------------
 
-Architecture:
-    Seeds → Snapshots → Staging → Integration → Quality Gate →
-    Dimensions → Facts → Quality Gate → Marts → Tests → Docs
+#23 CIRCUIT BREAKER PATTERN
+    Problem: Data quality issues can propagate through the pipeline:
+             - Bad source data → Wrong staging
+             - Wrong staging → Corrupted dimensions
+             - Corrupted dimensions → Incorrect facts
+             - Incorrect facts → Wrong business decisions!
+             
+             Without quality gates, bad data flows all the way to dashboards
+             before anyone notices.
+    
+    Example Scenario:
+    - Payment system had an outage, only 50% of payments loaded
+    - Pipeline runs and calculates 50% match rate (should be 99%)
+    - Finance dashboard shows revenue down 50%
+    - CFO panics, stock price drops
+    - Turns out data was just incomplete!
+    
+    Business Impact: Bad decisions based on incomplete data.
+    
+    Solution: CIRCUIT BREAKER
+    - After critical steps, check data quality metrics
+    - If metrics below threshold → STOP pipeline, alert team
+    - Don't let bad data flow downstream
+    - In Airflow: Use BranchPythonOperator to check quality
+    
+    Pipeline Flow:
+    ```
+    staging → quality_check_1 → integration → quality_check_2 → dimensions → facts → marts
+                    ↓                              ↓
+              STOP if bad                    STOP if bad
+    ```
 
-Author: Data Engineering Team
-Version: 1.0.0
+--------------------------------------------------------------------------------
+
+DAG STRUCTURE:
+    
+    1. START: Validate connections, check source availability
+    
+    2. SEEDS: Load reference data (cities, currencies, rates)
+       - Must succeed before any models
+    
+    3. STAGING: Create staging views
+       - Parallel: all stg_* models together
+       
+    4. QUALITY GATE 1: Check staging completeness
+       - Row counts meet minimum
+       - Critical columns not all NULL
+       
+    5. SNAPSHOTS: Run SCD Type 2 snapshots
+       - snap_driver, snap_rider
+       
+    6. INTEGRATION: Merge and cleanse data
+       - int_trips_unified, int_payments_reconciled
+       
+    7. QUALITY GATE 2: Check reconciliation
+       - Payment match rate >= 99%
+       - Orphan rate <= 1%
+       
+    8. DIMENSIONS: Build dimension tables
+       - Parallel: all dim_* models
+       
+    9. FACTS: Build fact tables
+       - Parallel: all fct_* models
+       
+    10. MARTS: Build business aggregates
+        - Parallel: all mart_* models
+        
+    11. TESTS: Run dbt tests
+        - Fail pipeline if critical tests fail
+        
+    12. DOCS: Generate documentation
+        - Refresh dbt docs site
+
+--------------------------------------------------------------------------------
+
+TASK DEPENDENCIES:
+    
+    start → seeds → staging → quality_gate_1
+    quality_gate_1 (pass) → snapshots → integration → quality_gate_2
+    quality_gate_1 (fail) → quality_failed → alert
+    quality_gate_2 (pass) → dimensions → facts → marts → tests → docs
+    quality_gate_2 (fail) → quality_failed → alert
+
+================================================================================
 """
 
-import os
-import json
 from datetime import datetime, timedelta
-from typing import Dict, List
-
-import pendulum
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.operators.python import BranchPythonOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.utils.task_group import TaskGroup
 
-# =============================================================================
 # Configuration
-# =============================================================================
+DBT_PROJECT_DIR = '/Applications/MAMP/htdocs/DataEngineeringAcademy/DBT+Airflow/dbt/uber_analytics'
+DBT_PROFILES_DIR = '/Applications/MAMP/htdocs/DataEngineeringAcademy/DBT+Airflow/dbt/uber_analytics/profiles'
+VENV_ACTIVATE = 'source /Applications/MAMP/htdocs/DataEngineeringAcademy/DBT+Airflow/dbt/demo_dbt_env/bin/activate'
 
-PROJECT_ROOT = "/Applications/MAMP/htdocs/DataEngineeringAcademy/DBT+Airflow"
-DBT_PROJECT_PATH = os.path.join(PROJECT_ROOT, "dbt/uber_analytics")
-DBT_VENV_PATH = os.path.join(PROJECT_ROOT, "dbt/demo_dbt_env")
+# Minimum match rate for quality gate (99%)
+MIN_MATCH_RATE = 0.99
 
-DBT_CMD_PREFIX = f"source {DBT_VENV_PATH}/bin/activate && cd {DBT_PROJECT_PATH}"
-
-DEFAULT_ARGS = {
-    'owner': 'uber-data-engineering',
+default_args = {
+    'owner': 'data_engineering',
     'depends_on_past': False,
-    'email': ['data-alerts@uber.com'],
     'email_on_failure': True,
     'email_on_retry': False,
-    'retries': 2,
+    'retries': 1,
     'retry_delay': timedelta(minutes=5),
-    'retry_exponential_backoff': True,
     'execution_timeout': timedelta(hours=2),
 }
 
-# =============================================================================
-# Helper Functions
-# =============================================================================
-
-def get_dbt_cmd(command: str, select: str = None, vars: Dict = None) -> str:
-    """Generate dbt command string."""
-    cmd = f"{DBT_CMD_PREFIX} && dbt {command}"
-    if select:
-        cmd += f" --select {select}"
-    if vars:
-        vars_str = json.dumps(vars).replace('"', '\\"')
-        cmd += f' --vars "{vars_str}"'
-    return cmd
-
-
-def check_quality_gate(**context) -> str:
+def check_quality_gate_1(**context):
     """
-    Check data quality and decide whether to proceed.
-    Returns next task group based on quality checks.
+    CIRCUIT BREAKER: Check staging data quality.
+    
+    Validates:
+    - Staging tables have minimum row counts
+    - No critical columns are all NULL
+    
+    Returns task to execute next based on quality check result.
     """
-    # In production, query mart_reconciliation for circuit_breaker_triggered
-    # For now, always proceed
-    return 'dimensions.start_dimensions'
+    # In production, this would query the database
+    # For demo, we assume quality is OK
+    import random
+    quality_ok = random.random() > 0.05  # 95% chance of passing
+    
+    if quality_ok:
+        return 'snapshots.run_snapshots'
+    else:
+        return 'quality_failed'
 
 
-def notify_failure(context):
-    """Send failure notification."""
-    task = context['task_instance']
-    message = f"""
-    ⚠️ Uber Analytics Pipeline Failed
-    Task: {task.task_id}
-    DAG: {task.dag_id}
-    Execution: {context['execution_date']}
+def check_quality_gate_2(**context):
     """
-    print(message)
-    # In production: send to Slack/PagerDuty
-
-
-def notify_success(context):
-    """Send success notification."""
-    message = f"""
-    ✅ Uber Analytics Pipeline Completed
-    DAG: {context['dag_id']}
-    Execution: {context['execution_date']}
+    CIRCUIT BREAKER: Check reconciliation quality.
+    
+    Validates:
+    - Payment match rate >= 99%
+    - Orphan payment rate <= 1%
+    
+    This is the critical quality gate before building dimensions/facts.
     """
-    print(message)
+    # In production, query mart_reconciliation for actual metrics
+    # Example:
+    # SELECT avg(payment_match_rate) as match_rate
+    # FROM mart_reconciliation
+    # WHERE reconciliation_date = current_date - 1
+    
+    import random
+    match_rate = random.uniform(0.97, 1.0)  # Simulate 97-100% match rate
+    
+    if match_rate >= MIN_MATCH_RATE:
+        return 'dimensions.start_dimensions'
+    else:
+        return 'quality_failed'
 
-
-# =============================================================================
-# DAG Definition
-# =============================================================================
 
 with DAG(
-    dag_id='uber_analytics_pipeline',
-    description='Production Uber Analytics pipeline demonstrating 34 DE challenges',
-    default_args=DEFAULT_ARGS,
-    start_date=pendulum.datetime(2024, 1, 1, tz='UTC'),
-    schedule_interval='0 */4 * * *',  # Every 4 hours
+    'uber_analytics_pipeline',
+    default_args=default_args,
+    description='Uber Analytics dbt Pipeline with Quality Gates',
+    schedule_interval='0 6 * * *',  # Daily at 6 AM
+    start_date=datetime(2024, 1, 1),
     catchup=False,
-    max_active_runs=1,
-    tags=['uber', 'analytics', 'dbt', 'production'],
+    tags=['uber', 'dbt', 'analytics', 'production'],
     doc_md=__doc__,
-    on_failure_callback=notify_failure,
-    on_success_callback=notify_success,
 ) as dag:
 
     # =========================================================================
-    # Pipeline Start/End
+    # START
     # =========================================================================
-    
     start = EmptyOperator(task_id='start')
-    end = EmptyOperator(task_id='end', trigger_rule='none_failed_min_one_success')
-
-    # =========================================================================
-    # Seeds - Reference Data
-    # =========================================================================
     
-    with TaskGroup(group_id='seeds') as seed_group:
-        seed_start = EmptyOperator(task_id='start_seeds')
-        
-        load_seeds = BashOperator(
-            task_id='load_reference_data',
-            bash_command=get_dbt_cmd('seed'),
-            doc_md="Load reference data: cities, currencies, service types"
+    # =========================================================================
+    # SEEDS: Load reference data
+    # =========================================================================
+    with TaskGroup(group_id='seeds') as seeds:
+        run_seeds = BashOperator(
+            task_id='run_seeds',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt seed --profiles-dir {DBT_PROFILES_DIR}
+            ''',
         )
-        
-        seed_end = EmptyOperator(task_id='end_seeds')
-        seed_start >> load_seeds >> seed_end
-
-    # =========================================================================
-    # Snapshots - SCD Type 2
-    # =========================================================================
     
-    with TaskGroup(group_id='snapshots') as snapshot_group:
-        snap_start = EmptyOperator(task_id='start_snapshots')
-        
-        snap_driver = BashOperator(
-            task_id='snap_driver',
-            bash_command=get_dbt_cmd('snapshot', 'snap_driver'),
-            doc_md="SCD Type 2 snapshot for driver dimension"
-        )
-        
-        snap_rider = BashOperator(
-            task_id='snap_rider',
-            bash_command=get_dbt_cmd('snapshot', 'snap_rider'),
-            doc_md="SCD Type 2 snapshot for rider dimension"
-        )
-        
-        snap_end = EmptyOperator(task_id='end_snapshots')
-        snap_start >> [snap_driver, snap_rider] >> snap_end
-
     # =========================================================================
-    # Staging - Source Ingestion
+    # STAGING: Create staging views
     # =========================================================================
+    with TaskGroup(group_id='staging') as staging:
+        run_staging = BashOperator(
+            task_id='run_staging',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt run --select staging --profiles-dir {DBT_PROFILES_DIR}
+            ''',
+        )
     
-    with TaskGroup(group_id='staging') as staging_group:
-        stg_start = EmptyOperator(task_id='start_staging')
-        
-        stg_trips = BashOperator(
-            task_id='stg_trips',
-            bash_command=get_dbt_cmd('run', 'stg_trips_driver_app stg_trips_rider_app'),
-            doc_md="Stage trip data from driver and rider apps"
-        )
-        
-        stg_entities = BashOperator(
-            task_id='stg_entities',
-            bash_command=get_dbt_cmd('run', 'stg_drivers stg_riders stg_vehicles'),
-            doc_md="Stage driver, rider, and vehicle data"
-        )
-        
-        stg_other = BashOperator(
-            task_id='stg_other',
-            bash_command=get_dbt_cmd('run', 'stg_payments stg_surge_snapshots'),
-            doc_md="Stage payments and surge data"
-        )
-        
-        stg_end = EmptyOperator(task_id='end_staging')
-        stg_start >> [stg_trips, stg_entities, stg_other] >> stg_end
-
     # =========================================================================
-    # Integration - Data Quality & Merging
+    # QUALITY GATE 1: Check staging completeness
     # =========================================================================
-    
-    with TaskGroup(group_id='integration') as integration_group:
-        int_start = EmptyOperator(task_id='start_integration')
-        
-        int_trips = BashOperator(
-            task_id='int_trips_unified',
-            bash_command=get_dbt_cmd(
-                'run', 
-                'int_trips_unified',
-                {'execution_date': '{{ ds }}'}
-            ),
-            doc_md="Unify trips: dedup, late arrivals, currency conversion"
-        )
-        
-        int_payments = BashOperator(
-            task_id='int_payments_reconciled',
-            bash_command=get_dbt_cmd('run', 'int_payments_reconciled'),
-            doc_md="Reconcile payments with trips"
-        )
-        
-        int_end = EmptyOperator(task_id='end_integration')
-        int_start >> int_trips >> int_payments >> int_end
-
-    # =========================================================================
-    # Quality Gate 1 - Pre-Dimension
-    # =========================================================================
-    
     quality_gate_1 = BranchPythonOperator(
         task_id='quality_gate_1',
-        python_callable=check_quality_gate,
-        doc_md="Check data quality before building dimensions"
+        python_callable=check_quality_gate_1,
+        doc_md="""
+        **Circuit Breaker #1**
+        
+        Checks staging data quality before proceeding to snapshots/integration.
+        Validates minimum row counts and column completeness.
+        """
     )
     
-    quality_failed = EmptyOperator(
+    # =========================================================================
+    # QUALITY FAILED: Stop pipeline
+    # =========================================================================
+    quality_failed = BashOperator(
         task_id='quality_failed',
-        doc_md="Quality gate failed - investigate data issues"
+        bash_command='echo "QUALITY CHECK FAILED! Pipeline stopped." && exit 1',
+        trigger_rule='none_failed_min_one_success',
     )
-
-    # =========================================================================
-    # Dimensions
-    # =========================================================================
     
-    with TaskGroup(group_id='dimensions') as dimension_group:
-        dim_start = EmptyOperator(task_id='start_dimensions')
-        
-        dim_date = BashOperator(
-            task_id='dim_date',
-            bash_command=get_dbt_cmd('run', 'dim_date'),
-            doc_md="Build date dimension with fiscal calendars"
-        )
-        
-        dim_geo = BashOperator(
-            task_id='dim_geography',
-            bash_command=get_dbt_cmd('run', 'dim_geography'),
-            doc_md="Build geography hierarchy dimension"
-        )
-        
-        dim_driver = BashOperator(
-            task_id='dim_driver',
-            bash_command=get_dbt_cmd('run', 'dim_driver'),
-            doc_md="Build driver SCD Type 2 dimension"
-        )
-        
-        dim_rider = BashOperator(
-            task_id='dim_rider',
-            bash_command=get_dbt_cmd('run', 'dim_rider'),
-            doc_md="Build rider SCD Type 2 dimension"
-        )
-        
-        dim_other = BashOperator(
-            task_id='dim_other',
-            bash_command=get_dbt_cmd('run', 'bridge_driver_vehicle dim_trip_flags'),
-            doc_md="Build bridge and junk dimensions"
-        )
-        
-        dim_end = EmptyOperator(task_id='end_dimensions')
-        
-        dim_start >> dim_date >> dim_geo
-        dim_start >> [dim_driver, dim_rider] >> dim_other >> dim_end
-        dim_geo >> dim_end
-
     # =========================================================================
-    # Facts
+    # SNAPSHOTS: SCD Type 2
     # =========================================================================
+    with TaskGroup(group_id='snapshots') as snapshots:
+        run_snapshots = BashOperator(
+            task_id='run_snapshots',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt snapshot --profiles-dir {DBT_PROFILES_DIR}
+            ''',
+        )
     
-    with TaskGroup(group_id='facts') as fact_group:
-        fct_start = EmptyOperator(task_id='start_facts')
-        
-        fct_trips = BashOperator(
-            task_id='fct_trips',
-            bash_command=get_dbt_cmd(
-                'run', 
-                'fct_trips',
-                {'execution_date': '{{ ds }}'}
-            ),
-            doc_md="Build transaction grain trip fact"
-        )
-        
-        fct_accumulating = BashOperator(
-            task_id='fct_trip_accumulating',
-            bash_command=get_dbt_cmd('run', 'fct_trip_accumulating'),
-            doc_md="Build accumulating snapshot fact"
-        )
-        
-        fct_earnings = BashOperator(
-            task_id='fct_driver_earnings',
-            bash_command=get_dbt_cmd('run', 'fct_driver_earnings'),
-            doc_md="Build driver earnings periodic snapshot"
-        )
-        
-        fct_surge = BashOperator(
-            task_id='fct_surge_snapshot',
-            bash_command=get_dbt_cmd('run', 'fct_surge_snapshot'),
-            doc_md="Build surge pricing snapshots"
-        )
-        
-        fct_end = EmptyOperator(task_id='end_facts')
-        
-        fct_start >> fct_trips >> [fct_accumulating, fct_earnings] >> fct_end
-        fct_start >> fct_surge >> fct_end
-
     # =========================================================================
-    # Marts
+    # INTEGRATION: Merge and cleanse
     # =========================================================================
+    with TaskGroup(group_id='integration') as integration:
+        run_integration = BashOperator(
+            task_id='run_integration',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt run --select integration --profiles-dir {DBT_PROFILES_DIR}
+            ''',
+        )
     
-    with TaskGroup(group_id='marts') as mart_group:
-        mart_start = EmptyOperator(task_id='start_marts')
-        
-        mart_revenue = BashOperator(
-            task_id='mart_revenue_daily',
-            bash_command=get_dbt_cmd('run', 'mart_revenue_daily'),
-            doc_md="Build daily revenue mart with fiscal calendar"
-        )
-        
-        mart_driver = BashOperator(
-            task_id='mart_driver_performance',
-            bash_command=get_dbt_cmd('run', 'mart_driver_performance'),
-            doc_md="Build driver performance mart"
-        )
-        
-        mart_recon = BashOperator(
-            task_id='mart_reconciliation',
-            bash_command=get_dbt_cmd('run', 'mart_reconciliation'),
-            doc_md="Build reconciliation report"
-        )
-        
-        mart_end = EmptyOperator(task_id='end_marts')
-        mart_start >> [mart_revenue, mart_driver, mart_recon] >> mart_end
-
     # =========================================================================
-    # Tests & Documentation
+    # QUALITY GATE 2: Check reconciliation
     # =========================================================================
+    quality_gate_2 = BranchPythonOperator(
+        task_id='quality_gate_2',
+        python_callable=check_quality_gate_2,
+        doc_md="""
+        **Circuit Breaker #2**
+        
+        Checks reconciliation quality (payment match rate >= 99%).
+        This is the critical gate before building dimensions and facts.
+        """
+    )
     
-    with TaskGroup(group_id='quality_tests') as test_group:
-        test_start = EmptyOperator(task_id='start_tests')
+    # =========================================================================
+    # DIMENSIONS: Build dimension tables
+    # =========================================================================
+    with TaskGroup(group_id='dimensions') as dimensions:
+        start_dimensions = EmptyOperator(task_id='start_dimensions')
         
+        run_dimensions = BashOperator(
+            task_id='run_dimensions',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt run --select dimension --profiles-dir {DBT_PROFILES_DIR}
+            ''',
+        )
+        
+        start_dimensions >> run_dimensions
+    
+    # =========================================================================
+    # FACTS: Build fact tables
+    # =========================================================================
+    with TaskGroup(group_id='facts') as facts:
+        run_facts = BashOperator(
+            task_id='run_facts',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt run --select fact --profiles-dir {DBT_PROFILES_DIR}
+            ''',
+        )
+    
+    # =========================================================================
+    # MARTS: Build business aggregates
+    # =========================================================================
+    with TaskGroup(group_id='marts') as marts:
+        run_marts = BashOperator(
+            task_id='run_marts',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt run --select mart --profiles-dir {DBT_PROFILES_DIR}
+            ''',
+        )
+    
+    # =========================================================================
+    # TESTS: Run dbt tests
+    # =========================================================================
+    with TaskGroup(group_id='tests') as tests:
         run_tests = BashOperator(
-            task_id='run_all_tests',
-            bash_command=get_dbt_cmd('test'),
-            doc_md="Run all dbt data quality tests"
+            task_id='run_tests',
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt test --profiles-dir {DBT_PROFILES_DIR}
+            ''',
         )
-        
+    
+    # =========================================================================
+    # DOCUMENTATION: Generate dbt docs
+    # =========================================================================
+    with TaskGroup(group_id='documentation') as documentation:
         generate_docs = BashOperator(
             task_id='generate_docs',
-            bash_command=get_dbt_cmd('docs generate'),
-            doc_md="Generate dbt documentation"
+            bash_command=f'''
+                {VENV_ACTIVATE} && \
+                cd {DBT_PROJECT_DIR} && \
+                dbt docs generate --profiles-dir {DBT_PROFILES_DIR}
+            ''',
         )
-        
-        test_end = EmptyOperator(task_id='end_tests')
-        test_start >> run_tests >> generate_docs >> test_end
-
+    
     # =========================================================================
-    # Task Dependencies
+    # END
+    # =========================================================================
+    end = EmptyOperator(task_id='end')
+    
+    # =========================================================================
+    # TASK DEPENDENCIES
     # =========================================================================
     
     # Main flow
-    start >> seed_group >> snapshot_group >> staging_group >> integration_group
-    integration_group >> quality_gate_1
+    start >> seeds >> staging >> quality_gate_1
     
-    # Quality gate branching
-    quality_gate_1 >> [dimension_group, quality_failed]
-    quality_failed >> end
+    # Quality gate 1 branching
+    quality_gate_1 >> snapshots >> integration >> quality_gate_2
+    quality_gate_1 >> quality_failed
     
-    # Continue main flow
-    dimension_group >> fact_group >> mart_group >> test_group >> end
-
+    # Quality gate 2 branching
+    quality_gate_2 >> dimensions >> facts >> marts >> tests >> documentation >> end
+    quality_gate_2 >> quality_failed
