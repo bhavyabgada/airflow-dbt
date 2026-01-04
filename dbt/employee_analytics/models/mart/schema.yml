@@ -1,0 +1,134 @@
+version: 2
+
+models:
+  - name: fct_employee_history
+    description: >
+      Fact table containing historical employee records.
+      Uses incremental APPEND strategy to maintain full history of all
+      employee data changes over time. Essential for historical analysis,
+      auditing, and trend reporting.
+    
+    config:
+      tags: ['daily', 'employee', 'fact', 'history']
+    
+    meta:
+      owner: 'data-engineering-team'
+      contains_pii: true
+      retention_days: 2555  # 7 years for compliance
+    
+    columns:
+      - name: employee_id
+        description: Employee identifier (not unique - multiple records per employee over time)
+        tests:
+          - not_null
+          - positive_value
+      
+      - name: first_name
+        description: Employee's first name at the time of this record
+        tests:
+          - not_null
+      
+      - name: last_name
+        description: Employee's last name at the time of this record
+        tests:
+          - not_null
+      
+      - name: date_of_birth
+        description: Employee's date of birth
+        tests:
+          - not_null
+          - date_in_past
+      
+      - name: hire_date
+        description: Employee's hire date
+        tests:
+          - not_null
+      
+      - name: record_date
+        description: >
+          The source system record date. Used for partitioning 
+          and filtering historical data.
+        tests:
+          - not_null
+      
+      - name: loaded_at
+        description: >
+          Timestamp when this record was loaded into the fact table.
+          Used for audit trail and debugging data pipeline issues.
+        tests:
+          - not_null
+
+  - name: dim_departments
+    description: >
+      Department dimension table populated from seed data.
+      Contains reference information about organizational departments.
+    
+    config:
+      tags: ['reference', 'dimension']
+    
+    columns:
+      - name: department_id
+        description: Unique identifier for the department
+        tests:
+          - unique
+          - not_null
+      
+      - name: department_name
+        description: Full name of the department
+        tests:
+          - not_null
+          - unique
+      
+      - name: department_code
+        description: Short code for the department (e.g., ENG, HR, FIN)
+        tests:
+          - not_null
+          - unique
+      
+      - name: cost_center
+        description: Financial cost center associated with this department
+      
+      - name: is_active
+        description: Whether the department is currently active
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+  - name: dim_job_titles
+    description: >
+      Job title dimension table populated from seed data.
+      Contains reference information about job positions and levels.
+    
+    config:
+      tags: ['reference', 'dimension']
+    
+    columns:
+      - name: job_title_id
+        description: Unique identifier for the job title
+        tests:
+          - unique
+          - not_null
+      
+      - name: job_title
+        description: Full job title name
+        tests:
+          - not_null
+      
+      - name: job_level
+        description: Organizational level (1=Entry, 2=Mid, 3=Senior, 4=Lead, 5=Director, 6=VP, 7=C-Level)
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7]
+      
+      - name: job_family
+        description: Job family/category (Engineering, Operations, Management, etc.)
+        tests:
+          - not_null
+      
+      - name: is_management
+        description: Whether this is a management position
+        tests:
+          - not_null
+

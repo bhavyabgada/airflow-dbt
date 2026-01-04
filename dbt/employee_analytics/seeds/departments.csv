@@ -1,0 +1,13 @@
+department_id,department_name,department_code,cost_center,is_active
+1,Engineering,ENG,CC-1001,true
+2,Human Resources,HR,CC-1002,true
+3,Finance,FIN,CC-1003,true
+4,Marketing,MKT,CC-1004,true
+5,Sales,SLS,CC-1005,true
+6,Operations,OPS,CC-1006,true
+7,Customer Success,CS,CC-1007,true
+8,Product Management,PM,CC-1008,true
+9,Data Science,DS,CC-1009,true
+10,Legal,LGL,CC-1010,true
+11,Information Technology,IT,CC-1011,true
+12,Research & Development,RD,CC-1012,false

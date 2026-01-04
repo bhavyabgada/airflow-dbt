@@ -1,0 +1,28 @@
+version: 2
+
+seeds:
+  - name: departments
+    description: >
+      Reference data for organizational departments.
+      This seed file contains the master list of all departments
+      with their codes, cost centers, and status.
+    config:
+      column_types:
+        department_id: integer
+        department_name: varchar(100)
+        department_code: varchar(10)
+        cost_center: varchar(20)
+        is_active: boolean
+
+  - name: job_titles
+    description: >
+      Reference data for job titles and organizational levels.
+      Contains the job ladder with levels from entry (1) to C-Level (7).
+    config:
+      column_types:
+        job_title_id: integer
+        job_title: varchar(100)
+        job_level: integer
+        job_family: varchar(50)
+        is_management: boolean
+

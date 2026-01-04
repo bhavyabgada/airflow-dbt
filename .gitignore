@@ -1,0 +1,82 @@
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+demo_dbt_env/
+demo_airflow_env/
+venv/
+ENV/
+env/
+.venv/
+
+# =============================================================================
+# dbt
+# =============================================================================
+dbt/employee_analytics/target/
+dbt/employee_analytics/dbt_packages/
+dbt/employee_analytics/logs/
+dbt/employee_analytics/dbt_modules/
+*.log
+
+# =============================================================================
+# Airflow
+# =============================================================================
+airflow/logs/
+airflow/airflow.db
+airflow/airflow-webserver.pid
+airflow/standalone_admin_password.txt
+airflow/*.pid
+airflow/*.err
+airflow/*.out
+
+# =============================================================================
+# IDE / Editor
+# =============================================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# =============================================================================
+# Environment Variables
+# =============================================================================
+.env
+.env.local
+.env.*.local
+*.env
+
+# =============================================================================
+# Secrets
+# =============================================================================
+secrets/
+*.pem
+*.key
+credentials.json
+

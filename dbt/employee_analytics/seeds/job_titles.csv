@@ -1,0 +1,26 @@
+job_title_id,job_title,job_level,job_family,is_management
+1,Software Engineer I,1,Engineering,false
+2,Software Engineer II,2,Engineering,false
+3,Senior Software Engineer,3,Engineering,false
+4,Staff Engineer,4,Engineering,false
+5,Engineering Manager,4,Engineering,true
+6,Senior Engineering Manager,5,Engineering,true
+7,Director of Engineering,5,Engineering,true
+8,VP of Engineering,6,Engineering,true
+9,Data Analyst,1,Analytics,false
+10,Senior Data Analyst,2,Analytics,false
+11,Data Scientist,3,Analytics,false
+12,Senior Data Scientist,3,Analytics,false
+13,Machine Learning Engineer,3,Analytics,false
+14,Analytics Manager,4,Analytics,true
+15,HR Coordinator,1,Human Resources,false
+16,HR Specialist,2,Human Resources,false
+17,HR Manager,4,Human Resources,true
+18,Director of HR,5,Human Resources,true
+19,Product Manager,3,Product,false
+20,Senior Product Manager,4,Product,false
+21,Director of Product,5,Product,true
+22,VP of Product,6,Product,true
+23,Chief Technology Officer,7,Executive,true
+24,Chief Executive Officer,7,Executive,true
+25,Chief Financial Officer,7,Executive,true

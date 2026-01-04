@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: dbt_audit_log
+    description: >
+      Central audit log for tracking all dbt model executions.
+      Records model start/end times, row counts, and execution status.
+      Used for monitoring, debugging, and compliance reporting.
+    
+    config:
+      tags: ['audit', 'monitoring']
+    
+    meta:
+      owner: 'platform-team'
+      retention_days: 90
+    
+    columns:
+      - name: log_id
+        description: Unique identifier for each log entry (MD5 hash)
+        tests:
+          - unique
+          - not_null
+      
+      - name: event_type
+        description: Type of event (MODEL_START, MODEL_END, ERROR)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['INIT', 'MODEL_START', 'MODEL_END', 'ERROR']
+      
+      - name: model_name
+        description: Name of the dbt model being executed
+        tests:
+          - not_null
+      
+      - name: schema_name
+        description: Target schema where the model is materialized
+        tests:
+          - not_null
+      
+      - name: invocation_id
+        description: Unique identifier for the dbt run/invocation
+        tests:
+          - not_null
+      
+      - name: event_timestamp
+        description: Timestamp when the event occurred
+        tests:
+          - not_null
+      
+      - name: status
+        description: Execution status (RUNNING, SUCCESS, FAILED)
+        tests:
+          - not_null
+      
+      - name: row_count
+        description: Number of rows in the model after execution
+      
+      - name: execution_time_ms
+        description: Time taken for model execution in milliseconds
+      
+      - name: run_started_at
+        description: Timestamp when the overall dbt run started
+      
+      - name: created_at
+        description: Timestamp when this log record was created
+        tests:
+          - not_null
+

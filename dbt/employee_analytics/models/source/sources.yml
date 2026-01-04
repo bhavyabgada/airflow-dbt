@@ -1,0 +1,53 @@
+version: 2
+
+sources:
+  - name: raw_employee_data
+    description: >
+      Raw employee data source from the HR system.
+      This source represents the landing zone for employee records
+      before transformation and quality checks.
+    database: dw
+    schema: dev
+    
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    
+    loaded_at_field: record_date
+    
+    tables:
+      - name: employees_raw
+        description: >
+          Raw employee records containing personal and employment information.
+          Each row represents an employee record snapshot from the source system.
+        identifier: employees_raw
+        
+        columns:
+          - name: employee_id
+            description: Unique identifier for the employee from the source system
+            tests:
+              - not_null
+          
+          - name: first_name
+            description: Employee's first/given name
+            tests:
+              - not_null
+          
+          - name: last_name
+            description: Employee's last/family name
+            tests:
+              - not_null
+          
+          - name: date_of_birth
+            description: Employee's date of birth in DD-MM-YYYY format
+          
+          - name: hire_date
+            description: Date and time when the employee was hired
+          
+          - name: record_date
+            description: >
+              The date this record was extracted from the source system.
+              Used for incremental processing and data freshness monitoring.
+            tests:
+              - not_null
+

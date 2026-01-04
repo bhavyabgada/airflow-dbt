@@ -1,0 +1,84 @@
+version: 2
+
+models:
+  - name: int_employees_merged
+    description: >
+      Employee dimension table using MERGE incremental strategy.
+      Contains the current/latest version of each employee record after
+      deduplication. This is the primary employee lookup table.
+    
+    config:
+      tags: ['daily', 'employee', 'dimension']
+    
+    columns:
+      - name: employee_id
+        description: Unique identifier for the employee (primary key)
+        tests:
+          - unique
+          - not_null
+          - positive_value
+      
+      - name: first_name
+        description: Employee's first/given name
+        tests:
+          - not_null
+          - not_empty_string
+      
+      - name: last_name
+        description: Employee's last/family name
+        tests:
+          - not_null
+          - not_empty_string
+      
+      - name: date_of_birth
+        description: Employee's date of birth (converted to DATE type)
+        tests:
+          - not_null
+          - date_in_past
+      
+      - name: hire_date
+        description: Date and time when the employee was hired
+        tests:
+          - not_null
+      
+      - name: record_date
+        description: Source system record date for this version
+        tests:
+          - not_null
+
+  - name: int_employees_snapshot
+    description: >
+      Employee snapshot table using DELETE+INSERT incremental strategy.
+      Completely replaces matching records on each run.
+      Useful for scenarios requiring full record replacement.
+    
+    config:
+      tags: ['daily', 'employee', 'snapshot']
+    
+    columns:
+      - name: employee_id
+        description: Unique identifier for the employee (primary key)
+        tests:
+          - unique
+          - not_null
+      
+      - name: first_name
+        description: Employee's first/given name
+        tests:
+          - not_null
+      
+      - name: last_name
+        description: Employee's last/family name
+        tests:
+          - not_null
+      
+      - name: date_of_birth
+        description: Employee's date of birth
+        tests:
+          - not_null
+      
+      - name: hire_date
+        description: Date and time when the employee was hired
+      
+      - name: record_date
+        description: Source system record date
