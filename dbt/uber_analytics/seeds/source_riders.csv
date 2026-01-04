@@ -1,0 +1,11 @@
+rider_id,first_name,last_name,email,phone,date_of_birth,city_id,rider_tier,lifetime_trips,lifetime_spend_usd,signup_date,last_trip_date,preferred_payment_method,is_active,fraud_flag,source_system,extracted_at
+R501,Alice,Anderson,alice.a@email.com,+1-555-1001,1990-05-15,NYC,GOLD,156,2850.00,2021-03-10,2024-01-15,CARD_1234,true,false,rider_app,2024-01-15 12:00:00
+R502,Bob,Baker,bob.b@email.com,+1-555-1002,1988-09-22,NYC,PLATINUM,342,6750.00,2019-11-05,2024-01-15,CARD_5678,true,false,rider_app,2024-01-15 12:00:00
+R503,Carol,Chen,carol.c@email.com,+1-555-1003,1995-02-28,NYC,SILVER,45,890.00,2023-06-15,2024-01-15,APPLE_PAY,true,false,rider_app,2024-01-15 12:00:00
+R504,David,Davies,david.d@email.co.uk,+44-20-5551004,1985-11-10,LON,GOLD,201,3200.00,2020-08-20,2024-01-15,CARD_9012,true,false,rider_app,2024-01-15 12:00:00
+R505,Emi,Endo,emi.e@email.jp,+81-3-5551005,1992-07-05,TOK,PLATINUM,520,125000.00,2018-04-01,2024-01-15,CARD_3456,true,false,rider_app,2024-01-15 12:00:00
+R506,Felix,Fernandez,felix.f@email.mx,+52-55-5551006,1998-03-18,MEX,BRONZE,28,420.00,2023-09-01,2024-01-15,CARD_7890,true,false,rider_app,2024-01-15 12:00:00
+R507,Grace,Green,grace.g@email.com,+1-555-1007,1993-06-25,NYC,SILVER,67,1250.00,2022-12-01,2024-01-15,CARD_1111,true,false,rider_app,2024-01-15 12:00:00
+R508,Henry,Hall,henry.h@email.com,+1-555-1008,1987-12-30,SFO,GOLD,189,4100.00,2020-05-15,2024-01-15,GOOGLE_PAY,true,false,rider_app,2024-01-15 12:00:00
+R509,Ivy,Irwin,ivy.i@email.com,+1-555-1009,1991-08-08,NYC,GOLD,134,2650.00,2021-07-20,2024-01-12,CARD_2222,true,false,rider_app,2024-01-15 12:00:00
+R510,Jack,Jones,jack.j@email.com,+1-555-1010,1983-04-02,LAX,SILVER,56,1100.00,2023-01-10,2024-01-15,CARD_3333,true,false,rider_app,2024-01-15 12:00:00

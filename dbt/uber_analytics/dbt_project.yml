@@ -1,0 +1,159 @@
+# =============================================================================
+# Uber Analytics Data Warehouse
+# =============================================================================
+# A comprehensive data engineering project demonstrating 34 real-world
+# data engineering challenges including:
+# - Multiple incremental strategies
+# - SCD Type 2 with point-in-time joins
+# - Multi-currency handling
+# - Late-arriving facts
+# - Data reconciliation
+# - And much more...
+# =============================================================================
+
+name: 'uber_analytics'
+version: '1.0.0'
+config-version: 2
+
+# =============================================================================
+# Variables
+# =============================================================================
+vars:
+  # Execution date for incremental loads
+  execution_date: '2024-01-15'
+  
+  # Payout period (Mon-Sun)
+  payout_week_start: 'Monday'
+  
+  # Base currency for reporting
+  reporting_currency: 'USD'
+  
+  # Data quality thresholds
+  min_reconciliation_match_rate: 0.99
+  max_duplicate_rate: 0.001
+  max_orphan_rate: 0.01
+  
+  # Feature flags
+  enable_surge_v2: false
+  enable_carbon_offset: true
+  
+  # PII masking (dev vs prod)
+  mask_pii: true
+
+# =============================================================================
+# Profile Configuration
+# =============================================================================
+profile: 'uber_analytics'
+
+# =============================================================================
+# Directory Configurations
+# =============================================================================
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# =============================================================================
+# Snapshot Configuration
+# =============================================================================
+snapshots:
+  uber_analytics:
+    +target_schema: dimension
+
+# =============================================================================
+# Seed Configuration
+# =============================================================================
+seeds:
+  uber_analytics:
+    +schema: staging
+    +quote_columns: false
+    
+    # Reference data
+    ref_cities:
+      +column_types:
+        city_id: varchar(10)
+        timezone: varchar(50)
+    
+    ref_currencies:
+      +column_types:
+        currency_code: varchar(3)
+        
+    ref_service_types:
+      +column_types:
+        service_type_id: varchar(10)
+
+# =============================================================================
+# Model Configurations
+# =============================================================================
+models:
+  uber_analytics:
+    # Staging layer - raw data from sources
+    staging:
+      +schema: staging
+      +materialized: view
+      +tags: ['staging', 'hourly']
+    
+    # Integration layer - cleansed and deduplicated
+    integration:
+      +schema: integration
+      +materialized: incremental
+      +tags: ['integration', 'hourly']
+    
+    # Dimension layer - SCD and lookups
+    dimension:
+      +schema: dimension
+      +materialized: table
+      +tags: ['dimension', 'daily']
+    
+    # Fact layer - transactional and snapshot facts
+    fact:
+      +schema: fact
+      +materialized: incremental
+      +tags: ['fact', 'hourly']
+    
+    # Mart layer - business aggregations
+    mart:
+      +schema: mart
+      +materialized: table
+      +tags: ['mart', 'daily']
+    
+    # Audit layer - logging and reconciliation
+    audit:
+      +schema: audit
+      +materialized: incremental
+      +tags: ['audit', 'hourly']
+
+# =============================================================================
+# Test Configuration
+# =============================================================================
+tests:
+  uber_analytics:
+    +severity: warn
+    +store_failures: true
+    +schema: quality
+
+# =============================================================================
+# On-Run Hooks
+# =============================================================================
+on-run-start:
+  - "{{ log('🚗 Starting Uber Analytics pipeline run', info=True) }}"
+  - "{{ create_audit_entry('PIPELINE_START') }}"
+
+on-run-end:
+  - "{{ create_audit_entry('PIPELINE_END') }}"
+  - "{{ log('✅ Uber Analytics pipeline completed', info=True) }}"
+
+# =============================================================================
+# Query Comment
+# =============================================================================
+query-comment:
+  comment: "uber_analytics | {{ node.name }} | {{ target.name }}"
+  append: true
+

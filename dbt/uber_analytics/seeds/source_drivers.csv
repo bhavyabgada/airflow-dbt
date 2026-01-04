@@ -1,0 +1,10 @@
+driver_id,first_name,last_name,email,phone,date_of_birth,ssn_last_four,license_number,license_state,license_expiry,city_id,status,rating,total_trips,signup_date,last_active_date,background_check_status,background_check_date,is_active,source_system,extracted_at
+D101,John,Smith,john.smith@email.com,+1-555-0101,1985-03-15,1234,DL12345678,NY,2025-03-15,NYC,ACTIVE,4.92,1523,2022-06-15,2024-01-15,APPROVED,2022-06-10,true,driver_app,2024-01-15 12:00:00
+D102,Maria,Garcia,maria.g@email.com,+1-555-0102,1990-07-22,5678,DL87654321,NY,2024-07-22,NYC,ACTIVE,4.85,892,2023-01-10,2024-01-15,APPROVED,2023-01-05,true,driver_app,2024-01-15 12:00:00
+D103,James,Wilson,j.wilson@email.co.uk,+44-20-5550103,1988-11-08,9012,DVLA123456,UK,2025-11-08,LON,ACTIVE,4.95,2105,2021-09-20,2024-01-15,APPROVED,2021-09-15,true,driver_app,2024-01-15 12:00:00
+D104,Yuki,Tanaka,y.tanaka@email.jp,+81-3-5550104,1992-04-18,3456,JP12345678,TK,2025-04-18,TOK,ACTIVE,4.98,3201,2020-03-01,2024-01-15,APPROVED,2020-02-25,true,driver_app,2024-01-15 12:00:00
+D105,Carlos,Rodriguez,c.rodriguez@email.mx,+52-55-5550105,1987-09-30,7890,MEX123456,CDMX,2024-09-30,MEX,ACTIVE,4.78,456,2023-06-01,2024-01-15,APPROVED,2023-05-28,true,driver_app,2024-01-15 12:00:00
+D106,Sarah,Johnson,sarah.j@email.com,+1-555-0106,1993-12-05,2345,DL11223344,CA,2025-12-05,SFO,ACTIVE,4.88,1105,2022-11-15,2024-01-15,APPROVED,2022-11-10,true,driver_app,2024-01-15 12:00:00
+D107,Michael,Brown,m.brown@email.com,+1-555-0107,1980-05-20,6789,DL55667788,NY,2024-05-20,NYC,INACTIVE,4.65,2890,2019-08-01,2024-01-12,APPROVED,2019-07-28,false,driver_app,2024-01-15 12:00:00
+D108,Emily,Davis,e.davis@email.com,+1-555-0108,1995-08-12,0123,DL99887766,CA,2026-08-12,LAX,ACTIVE,4.91,678,2023-03-20,2024-01-15,APPROVED,2023-03-15,true,driver_app,2024-01-15 12:00:00
+D109,Robert,Lee,r.lee@email.com,+1-555-0109,1982-01-25,4567,DL44332211,NY,2025-01-25,NYC,PENDING,0.00,0,2024-01-14,2024-01-14,PENDING,,,driver_app,2024-01-15 12:00:00

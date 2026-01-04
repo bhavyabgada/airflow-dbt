@@ -1,0 +1,12 @@
+currency_code,currency_name,symbol,decimal_places,is_active
+USD,US Dollar,$,2,true
+EUR,Euro,€,2,true
+GBP,British Pound,£,2,true
+JPY,Japanese Yen,¥,0,true
+AUD,Australian Dollar,A$,2,true
+CAD,Canadian Dollar,C$,2,true
+MXN,Mexican Peso,$,2,true
+BRL,Brazilian Real,R$,2,true
+INR,Indian Rupee,₹,2,true
+SGD,Singapore Dollar,S$,2,true
+AED,UAE Dirham,د.إ,2,true

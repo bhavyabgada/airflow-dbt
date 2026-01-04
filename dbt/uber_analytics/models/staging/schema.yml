@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: stg_trips_driver_app
+    description: >
+      Staging model for trip data from driver application.
+      Contains driver-side trip details including earnings and ratings received.
+    columns:
+      - name: trip_id
+        description: Unique trip identifier
+        tests:
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
+      - name: currency_code
+        tests:
+          - not_null
+
+  - name: stg_trips_rider_app
+    description: >
+      Staging model for trip data from rider application.
+      Contains rider-side details including feedback and promo usage.
+      Includes duplicate detection flag.
+    columns:
+      - name: trip_id
+        tests:
+          - not_null
+      - name: rider_id
+        tests:
+          - not_null
+      - name: _is_potential_duplicate
+        description: Flag indicating if this record may be a duplicate submission
+
+  - name: stg_payments
+    description: >
+      Staging model for payment transactions.
+      Includes trip fares, refunds, and cancellation fees.
+    columns:
+      - name: payment_id
+        tests:
+          - unique
+          - not_null
+      - name: trip_id
+        tests:
+          - not_null
+
+  - name: stg_drivers
+    description: >
+      Staging model for driver profiles.
+      PII is masked based on environment configuration.
+    columns:
+      - name: driver_id
+        tests:
+          - unique
+          - not_null
+      - name: _row_hash
+        description: Hash of changeable fields for incremental detection
+
+  - name: stg_riders
+    description: >
+      Staging model for rider profiles.
+      Includes GDPR data retention date calculation.
+    columns:
+      - name: rider_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_vehicles
+    description: >
+      Staging model for vehicle data.
+      Supports many-to-many relationship with drivers.
+    columns:
+      - name: vehicle_id
+        tests:
+          - unique
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
+
+  - name: stg_surge_snapshots
+    description: >
+      Staging model for surge pricing snapshots.
+      Captured every 2 minutes with validity window.
+    columns:
+      - name: snapshot_id
+        tests:
+          - unique
+          - not_null
+

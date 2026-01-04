@@ -1,0 +1,10 @@
+vehicle_id,driver_id,make,model,year,color,license_plate,vehicle_type,capacity,is_primary,registration_expiry,insurance_expiry,inspection_date,is_active,source_system,extracted_at
+V201,D101,Toyota,Camry,2021,Black,ABC1234,SEDAN,4,true,2024-06-30,2024-06-30,2024-01-10,true,driver_app,2024-01-15 12:00:00
+V202,D102,Honda,Accord,2022,White,XYZ5678,SEDAN,4,true,2024-09-15,2024-09-15,2024-01-05,true,driver_app,2024-01-15 12:00:00
+V203,D103,Mercedes,E-Class,2023,Black,UK123AB,LUXURY,4,true,2024-11-30,2024-11-30,2024-01-08,true,driver_app,2024-01-15 12:00:00
+V204,D104,Toyota,Crown,2022,Black,品川500あ1234,LUXURY,4,true,2024-08-31,2024-08-31,2024-01-12,true,driver_app,2024-01-15 12:00:00
+V205,D105,Nissan,Versa,2020,Silver,MEX-123-AB,SEDAN,4,true,2024-12-31,2024-12-31,2024-01-03,true,driver_app,2024-01-15 12:00:00
+V206,D106,Tesla,Model 3,2023,Blue,CA-TESLA1,SEDAN,4,true,2025-03-31,2025-03-31,2024-01-15,true,driver_app,2024-01-15 12:00:00
+V207,D107,Ford,Fusion,2019,Gray,NYS9876,SEDAN,4,true,2024-02-28,2024-02-28,2023-12-20,true,driver_app,2024-01-15 12:00:00
+V208,D108,Hyundai,Sonata,2022,Red,CA-HYUN22,SEDAN,4,true,2024-10-31,2024-10-31,2024-01-11,true,driver_app,2024-01-15 12:00:00
+V209,D101,Toyota,Highlander,2020,Gray,ABC5678,SUV,6,false,2024-06-30,2024-06-30,2024-01-10,true,driver_app,2024-01-15 12:00:00

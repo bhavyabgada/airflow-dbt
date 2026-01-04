@@ -1,0 +1,12 @@
+trip_id,rider_id,city_id,service_type_id,trip_status,request_timestamp,pickup_address,dropoff_address,estimated_fare,actual_fare,payment_method,promo_code,promo_discount,rating_given_to_driver,feedback_text,source_system,extracted_at
+T001,R501,NYC,UBER_X,TRIP_COMPLETED,2024-01-15 08:30:00,350 5th Ave New York,Penn Station,20.00,24.00,CARD_1234,,,5,Great driver!,rider_app,2024-01-15 09:15:00
+T002,R502,NYC,UBER_X,TRIP_COMPLETED,2024-01-15 08:45:00,Penn Station,Times Square,25.00,33.00,CARD_5678,SAVE20,6.60,4,,rider_app,2024-01-15 09:25:00
+T003,R503,NYC,UBER_X,TRIP_COMPLETED,2024-01-15 09:30:00,Times Square,Grand Central,15.00,17.00,APPLE_PAY,,,5,Very smooth ride,rider_app,2024-01-15 10:05:00
+T004,R504,LON,UBER_X,TRIP_COMPLETED,2024-01-15 14:00:00,Big Ben,Tower Bridge,18.00,21.10,CARD_9012,,,5,,rider_app,2024-01-15 14:45:00
+T005,R505,TOK,UBER_BLACK,TRIP_COMPLETED,2024-01-15 23:00:00,Tokyo Station,Shibuya,5000,5200,CARD_3456,,,5,Perfect service,rider_app,2024-01-15 23:55:00
+T006,R506,MEX,UBER_X,TRIP_COMPLETED,2024-01-15 10:00:00,Zocalo,Chapultepec,130.00,140.00,CARD_7890,,,4,,rider_app,2024-01-15 10:40:00
+T007,R507,NYC,UBER_X,CANCELLED_BY_RIDER,2024-01-15 11:00:00,350 5th Ave,,,5.00,CARD_1111,,,,,rider_app,2024-01-15 11:10:00
+T008,R508,SFO,UBER_POOL,TRIP_COMPLETED,2024-01-15 17:30:00,Ferry Building,Golden Gate Park,20.00,29.00,GOOGLE_PAY,,,4,,rider_app,2024-01-15 18:25:00
+T009,R509,NYC,UBER_X,TRIP_COMPLETED,2024-01-12 09:00:00,350 5th Ave,Wall Street,32.00,36.50,CARD_2222,,,5,Excellent,rider_app,2024-01-15 10:05:00
+T010,R510,LAX,UBER_X,TRIP_COMPLETED,2024-01-15 07:00:00,LAX Airport,Downtown LA,50.00,57.50,CARD_3333,AIRPORT10,5.75,5,,rider_app,2024-01-15 07:55:00
+T002_DUP,R502,NYC,UBER_X,TRIP_COMPLETED,2024-01-15 08:45:00,Penn Station,Times Square,25.00,33.00,CARD_5678,SAVE20,6.60,4,,rider_app,2024-01-15 09:25:01

@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: int_trips_unified
+    description: >
+      Unified trip model combining driver and rider app data.
+      Handles deduplication, late arrivals, timezone conversion, and currency conversion.
+    
+    columns:
+      - name: trip_id
+        description: Unique trip identifier
+        tests:
+          - unique
+          - not_null
+      
+      - name: is_late_arrival
+        description: >
+          Flag indicating if this trip data arrived more than 24 hours
+          after the trip request time (e.g., from offline POS sync).
+      
+      - name: total_fare_usd
+        description: Total fare converted to USD at transaction date rate
+        tests:
+          - not_null
+    
+    meta:
+      problems_addressed:
+        - "Late-Arriving Facts"
+        - "Duplicate Detection"
+        - "Timezone Handling"
+        - "Multi-Source Merge"
+        - "Currency Conversion"
+
+  - name: int_payments_reconciled
+    description: >
+      Payment data reconciled with trips.
+      Identifies orphan payments and calculates net amounts after refunds.
+    
+    columns:
+      - name: payment_id
+        description: Unique payment identifier
+        tests:
+          - unique
+          - not_null
+      
+      - name: is_orphan_payment
+        description: >
+          Flag indicating payment has no matching trip.
+          These require investigation.
+      
+      - name: reconciliation_status
+        description: Status of payment-trip reconciliation
+        tests:
+          - accepted_values:
+              values: ['ORPHAN', 'RECONCILED', 'PENDING']
+    
+    meta:
+      problems_addressed:
+        - "Orphan Records"
+        - "Data Reconciliation"
+        - "Idempotency"
+

@@ -1,0 +1,12 @@
+snapshot_id,city_id,zone_id,zone_name,surge_multiplier,demand_level,supply_level,snapshot_timestamp,source_system,extracted_at
+SRG001,NYC,NYC_Z01,Midtown Manhattan,1.0,NORMAL,NORMAL,2024-01-15 08:00:00,surge_service,2024-01-15 08:02:00
+SRG002,NYC,NYC_Z01,Midtown Manhattan,1.2,HIGH,NORMAL,2024-01-15 08:30:00,surge_service,2024-01-15 08:32:00
+SRG003,NYC,NYC_Z01,Midtown Manhattan,1.5,VERY_HIGH,LOW,2024-01-15 09:00:00,surge_service,2024-01-15 09:02:00
+SRG004,NYC,NYC_Z01,Midtown Manhattan,1.8,CRITICAL,VERY_LOW,2024-01-15 09:30:00,surge_service,2024-01-15 09:32:00
+SRG005,NYC,NYC_Z01,Midtown Manhattan,1.2,HIGH,NORMAL,2024-01-15 10:00:00,surge_service,2024-01-15 10:02:00
+SRG006,NYC,NYC_Z01,Midtown Manhattan,1.0,NORMAL,NORMAL,2024-01-15 10:30:00,surge_service,2024-01-15 10:32:00
+SRG007,NYC,NYC_Z02,Financial District,1.0,NORMAL,NORMAL,2024-01-15 08:00:00,surge_service,2024-01-15 08:02:00
+SRG008,NYC,NYC_Z02,Financial District,1.3,HIGH,LOW,2024-01-15 08:30:00,surge_service,2024-01-15 08:32:00
+SRG009,LON,LON_Z01,Central London,1.2,HIGH,NORMAL,2024-01-15 14:00:00,surge_service,2024-01-15 14:02:00
+SRG010,TOK,TOK_Z01,Shibuya,1.0,NORMAL,HIGH,2024-01-15 23:00:00,surge_service,2024-01-15 23:02:00
+SRG011,SFO,SFO_Z01,Financial District,2.0,CRITICAL,VERY_LOW,2024-01-15 17:30:00,surge_service,2024-01-15 17:32:00

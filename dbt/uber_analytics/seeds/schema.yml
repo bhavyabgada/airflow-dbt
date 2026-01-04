@@ -1,0 +1,73 @@
+version: 2
+
+seeds:
+  - name: ref_cities
+    description: >
+      Reference data for cities where Uber operates.
+      Contains timezone, currency, and fiscal year information.
+    columns:
+      - name: city_id
+        description: Unique city identifier (3-letter code)
+        tests:
+          - unique
+          - not_null
+      - name: timezone
+        description: IANA timezone identifier for the city
+        tests:
+          - not_null
+      - name: currency_code
+        description: Local currency code (ISO 4217)
+        tests:
+          - not_null
+
+  - name: ref_currencies
+    description: >
+      Reference data for currencies supported by Uber.
+      Used for multi-currency conversion and reporting.
+    columns:
+      - name: currency_code
+        description: ISO 4217 currency code
+        tests:
+          - unique
+          - not_null
+
+  - name: ref_service_types
+    description: >
+      Reference data for Uber service types (UberX, Black, Eats, etc.).
+      Contains pricing multipliers and commission rates.
+    columns:
+      - name: service_type_id
+        description: Unique service type identifier
+        tests:
+          - unique
+          - not_null
+
+  - name: ref_currency_rates
+    description: >
+      Historical currency exchange rates.
+      Used for point-in-time currency conversion.
+    columns:
+      - name: rate_date
+        description: Date of the exchange rate
+        tests:
+          - not_null
+      - name: from_currency
+        description: Source currency code
+        tests:
+          - not_null
+      - name: exchange_rate
+        description: Rate to convert to USD
+        tests:
+          - not_null
+
+  - name: ref_trip_status
+    description: >
+      Reference data for trip statuses.
+      Defines the trip lifecycle stages.
+    columns:
+      - name: status_id
+        description: Unique status identifier
+        tests:
+          - unique
+          - not_null
+

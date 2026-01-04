@@ -1,24 +1,25 @@
 version: '3.8'
 
 services:
-  postgres:
+  # Main Data Warehouse
+  postgres_dw:
     image: postgres:15
-    container_name: dbt_airflow_postgres
+    container_name: uber_data_warehouse
     environment:
-      POSTGRES_USER: dw_user
-      POSTGRES_PASSWORD: dw_password
-      POSTGRES_DB: dw
+      POSTGRES_USER: uber_dw
+      POSTGRES_PASSWORD: uber_dw_password
+      POSTGRES_DB: uber_analytics
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_dw_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dw_user -d dw"]
+      test: ["CMD-SHELL", "pg_isready -U uber_dw -d uber_analytics"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
 
 volumes:
-  postgres_data:
-
+  postgres_dw_data:

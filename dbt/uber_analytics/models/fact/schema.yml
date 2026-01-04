@@ -1,0 +1,98 @@
+version: 2
+
+models:
+  - name: fct_trips
+    description: >
+      Transaction grain fact table for completed trips.
+      One row per trip with all dimensional keys and USD-converted measures.
+      Supports point-in-time joins to driver/rider dimensions.
+    
+    meta:
+      problems_addressed:
+        - "Late-Arriving Facts"
+        - "Point-in-Time Joins"
+        - "Currency Conversion"
+        - "Role-Playing Dimensions"
+        - "Junk Dimensions"
+        - "Large Table Joins"
+        - "Partitioning Strategy"
+    
+    columns:
+      - name: trip_id
+        description: Primary key - unique trip identifier
+        tests:
+          - unique
+          - not_null
+      - name: driver_key
+        description: Surrogate key to driver at time of trip (SCD2)
+      - name: rider_key
+        description: Surrogate key to rider at time of trip (SCD2)
+      - name: trip_flag_key
+        description: Surrogate key to junk dimension
+      - name: total_fare_usd
+        description: Total fare in USD (converted at transaction date)
+        tests:
+          - not_null
+
+  - name: fct_trip_accumulating
+    description: >
+      Accumulating snapshot tracking trip lifecycle milestones.
+      Updated as trip progresses through stages: requested → assigned → started → completed → paid.
+    
+    meta:
+      problems_addressed:
+        - "Accumulating Snapshot Facts"
+    
+    columns:
+      - name: trip_id
+        tests:
+          - unique
+          - not_null
+      - name: current_milestone
+        description: Current milestone number (1-5)
+        tests:
+          - not_null
+      - name: is_lifecycle_complete
+        description: True when payment is received
+
+  - name: fct_driver_earnings
+    description: >
+      Periodic snapshot of driver earnings aggregated by payout week (Mon-Sun).
+      Used for driver payout calculations and performance tracking.
+    
+    meta:
+      problems_addressed:
+        - "Currency Conversion"
+        - "Fiscal Calendar (Payout Week)"
+    
+    columns:
+      - name: earnings_key
+        tests:
+          - unique
+          - not_null
+      - name: driver_id
+        tests:
+          - not_null
+      - name: total_earnings_usd
+        description: Gross earnings + tips in USD
+
+  - name: fct_surge_snapshot
+    description: >
+      Periodic snapshot of surge pricing captured every 2 minutes.
+      Use valid_from/valid_to for point-in-time surge lookups.
+    
+    meta:
+      problems_addressed:
+        - "Point-in-Time Joins"
+        - "Rapidly Changing Dimensions"
+    
+    columns:
+      - name: snapshot_key
+        tests:
+          - unique
+          - not_null
+      - name: valid_from
+        description: Start of surge validity window
+      - name: valid_to
+        description: End of surge validity window (2 min later)
+

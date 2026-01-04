@@ -1,0 +1,16 @@
+city_id,city_name,country_code,country_name,region,timezone,currency_code,fiscal_year_start_month,is_active
+NYC,New York,US,United States,North America,America/New_York,USD,1,true
+LAX,Los Angeles,US,United States,North America,America/Los_Angeles,USD,1,true
+CHI,Chicago,US,United States,North America,America/Chicago,USD,1,true
+MIA,Miami,US,United States,North America,America/New_York,USD,1,true
+SFO,San Francisco,US,United States,North America,America/Los_Angeles,USD,1,true
+LON,London,GB,United Kingdom,EMEA,Europe/London,GBP,4,true
+PAR,Paris,FR,France,EMEA,Europe/Paris,EUR,1,true
+BER,Berlin,DE,Germany,EMEA,Europe/Berlin,EUR,1,true
+TOK,Tokyo,JP,Japan,APAC,Asia/Tokyo,JPY,4,true
+SYD,Sydney,AU,Australia,APAC,Australia/Sydney,AUD,7,true
+MEX,Mexico City,MX,Mexico,LATAM,America/Mexico_City,MXN,1,true
+SAO,Sao Paulo,BR,Brazil,LATAM,America/Sao_Paulo,BRL,1,true
+MUM,Mumbai,IN,India,APAC,Asia/Kolkata,INR,4,true
+SIN,Singapore,SG,Singapore,APAC,Asia/Singapore,SGD,1,true
+DXB,Dubai,AE,UAE,EMEA,Asia/Dubai,AED,1,true

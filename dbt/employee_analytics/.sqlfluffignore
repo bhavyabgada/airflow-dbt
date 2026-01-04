@@ -1,9 +1,0 @@
-# Ignore dbt artifacts
-target/
-dbt_packages/
-logs/
-
-# Ignore compiled files
-target/compiled/
-target/run/
-

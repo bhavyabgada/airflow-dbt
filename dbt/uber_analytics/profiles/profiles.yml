@@ -1,0 +1,37 @@
+# Uber Analytics dbt Profile
+# Copy this to ~/.dbt/profiles.yml
+
+uber_analytics:
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: uber_dw
+      pass: uber_dw_password
+      dbname: uber_analytics
+      schema: dev
+      threads: 4
+
+    staging:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: uber_dw
+      pass: uber_dw_password
+      dbname: uber_analytics
+      schema: staging
+      threads: 4
+
+    prod:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: uber_dw
+      pass: uber_dw_password
+      dbname: uber_analytics
+      schema: prod
+      threads: 8
+
+  target: dev
+

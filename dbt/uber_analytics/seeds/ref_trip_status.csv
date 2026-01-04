@@ -1,0 +1,11 @@
+status_id,status_name,status_category,is_completed,is_cancelled,is_billable,display_order
+1,REQUESTED,In Progress,false,false,false,1
+2,DRIVER_ASSIGNED,In Progress,false,false,false,2
+3,DRIVER_EN_ROUTE,In Progress,false,false,false,3
+4,DRIVER_ARRIVED,In Progress,false,false,false,4
+5,TRIP_STARTED,In Progress,false,false,false,5
+6,TRIP_COMPLETED,Completed,true,false,true,6
+7,CANCELLED_BY_RIDER,Cancelled,false,true,false,7
+8,CANCELLED_BY_DRIVER,Cancelled,false,true,false,8
+9,NO_DRIVERS_AVAILABLE,Failed,false,true,false,9
+10,PAYMENT_FAILED,Failed,false,false,false,10

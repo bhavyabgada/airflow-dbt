@@ -1,0 +1,117 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: >
+      Date dimension with both calendar and fiscal attributes.
+      Role-playing dimension used for request_date, pickup_date, dropoff_date, payment_date.
+      Includes multiple fiscal calendars (US, UK/Japan, Australia).
+    
+    meta:
+      problems_addressed:
+        - "Fiscal vs Calendar"
+        - "Role-Playing Dimensions"
+    
+    columns:
+      - name: date_key
+        description: Integer surrogate key in YYYYMMDD format
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_geography
+    description: >
+      Geography dimension with Zone → City → Country → Region hierarchy.
+      Supports drill-down/drill-up in reporting.
+    
+    meta:
+      problems_addressed:
+        - "Hierarchical Data"
+        - "Outrigger Dimensions"
+    
+    columns:
+      - name: geography_key
+        tests:
+          - unique
+          - not_null
+      - name: zone_id
+        tests:
+          - not_null
+
+  - name: dim_driver
+    description: >
+      Driver dimension with SCD Type 2 history.
+      Use valid_from/valid_to for point-in-time lookups.
+    
+    meta:
+      problems_addressed:
+        - "Point-in-Time Joins"
+        - "SCD Type 2"
+    
+    columns:
+      - name: driver_key
+        description: Surrogate key for this version of the driver
+        tests:
+          - unique
+          - not_null
+      - name: driver_id
+        description: Natural key (not unique due to SCD2)
+        tests:
+          - not_null
+      - name: is_current
+        description: True if this is the current version
+
+  - name: dim_rider
+    description: >
+      Rider dimension with SCD Type 2 history.
+      Includes GDPR data retention date.
+    
+    meta:
+      problems_addressed:
+        - "Point-in-Time Joins"
+        - "Data Retention/GDPR"
+    
+    columns:
+      - name: rider_key
+        tests:
+          - unique
+          - not_null
+      - name: is_eligible_for_deletion
+        description: True if data retention period has passed (GDPR)
+
+  - name: bridge_driver_vehicle
+    description: >
+      Bridge table for many-to-many driver-vehicle relationship.
+      Includes allocation weights for proper aggregation.
+    
+    meta:
+      problems_addressed:
+        - "Bridge Tables (Many-to-Many)"
+    
+    columns:
+      - name: bridge_key
+        tests:
+          - unique
+          - not_null
+      - name: allocation_weight
+        description: Weight for aggregations (1.0 for primary, 0.5 for secondary)
+
+  - name: dim_trip_flags
+    description: >
+      Junk dimension combining low-cardinality trip flags.
+      Use trip_flag_key in fact tables instead of multiple boolean columns.
+    
+    meta:
+      problems_addressed:
+        - "Junk Dimensions"
+    
+    columns:
+      - name: trip_flag_key
+        tests:
+          - unique
+          - not_null
+
